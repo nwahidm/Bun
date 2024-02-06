@@ -10,7 +10,7 @@ const url = "http://paket2.kejaksaan.info:5025/"
 export const createNotification = async (req: Request, res: Response, next: NextFunction) => {
     const { judul, isi, kewenangan_id } = req.body
     let foto, kewenangans
-    if (req.files) {
+    if (req.files && (req.files as MulterFiles)['foto']) {
         foto = (req.files as MulterFiles)['foto'][0].path
     }
     if (kewenangan_id) {
@@ -74,7 +74,7 @@ export const fetchNotificationDetail = async (req: JWTRequest, res: Response, ne
     const { _id } = req.user!
     const id = req.params.id
     console.log("[FETCH NOTIFICATION DETAIL]", id)
-    
+
     try {
         const notification = await Notification.findById(id)
 
@@ -86,9 +86,9 @@ export const fetchNotificationDetail = async (req: JWTRequest, res: Response, ne
         }
 
         notification.foto = url + notification.foto
-    
+
         await User.updateOne({ _id, 'notifications.notification_id': id }, { $set: { 'notifications.$.isRead': true } })
-        
+
         res.status(200).json({
             status: 200,
             data: notification
@@ -101,7 +101,7 @@ export const fetchNotificationDetail = async (req: JWTRequest, res: Response, ne
 export const fetchUserNotification = async (req: JWTRequest, res: Response, next: NextFunction) => {
     const { _id } = req.user!
     console.log('[FETCH USER NOTIFICATION]')
-    
+
     try {
         const userNotification = await User.findById(_id)
         const notifications = userNotification!.notifications

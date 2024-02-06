@@ -15,7 +15,7 @@ export interface MulterFiles {
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
     const { username, email, password, nama_lengkap, nip, jenis_kelamin } = req.body
     let avatar
-    if (req.files) {
+    if (req.files && (req.files as MulterFiles)['avatar']) {
         avatar = (req.files as MulterFiles)['avatar'][0].path
     }
     console.log("[REGISTER USER]", username, email, password, nama_lengkap, nip, jenis_kelamin, avatar)
@@ -206,7 +206,7 @@ export const updateProfile = async (req: JWTRequest, res: Response, next: NextFu
     const { _id, browser, os, ip } = req.user!
     const { username, password, email, nama_lengkap, nip, jenis_kelamin } = req.body
     let avatar
-    if (req.files) {
+    if (req.files && (req.files as MulterFiles)['avatar']) {
         avatar = (req.files as MulterFiles)['avatar'][0].path
     }
     console.log("[UPDATE PROFILE]", username, password, email, nama_lengkap, nip, jenis_kelamin, avatar)
@@ -329,7 +329,7 @@ export const updateUser = async (req: JWTRequest, res: Response, next: NextFunct
     const id = req.params.id
     const { username, email, password, repassword, nama_lengkap, nip, jenis_kelamin, kewenangan_id } = req.body
     let avatar
-    if (req.file) {
+    if (req.files && (req.files as MulterFiles)['avatar']) {
         avatar = (req.files as MulterFiles)['avatar'][0].path
     }
     console.log("[UPDATE USER]", _id, id, username, email, password, repassword, nama_lengkap, nip, jenis_kelamin, kewenangan_id, avatar)
