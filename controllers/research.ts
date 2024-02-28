@@ -17,12 +17,18 @@ export const fetchAllResearch = async (req: Request, res: Response, next: NextFu
 }
 
 export const createResearch = async (req: Request, res: Response, next: NextFunction) => {
-    const { lapinsus } = req.body
-    console.log("[CREATE RESEARCH]", lapinsus)
+    const { lapinsus,advice, follow_up, threats, interference, barrier, challenges } = req.body
+    console.log("[CREATE RESEARCH]", lapinsus, advice, follow_up, threats, interference, barrier, challenges)
 
     try {
         const newResearch = new Research({
-            lapinsus
+            lapinsus,
+            advice,
+            follow_up,
+            threats,
+            interference,
+            barrier,
+            challenges
         })
 
         await newResearch.save()
