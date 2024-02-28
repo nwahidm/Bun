@@ -4,6 +4,7 @@ import userRouter from "./routes/users"
 import logRouter from "./routes/log_activities"
 import kewenanganRouter from "./routes/kewenangan"
 import notificationRouter from "./routes/notifications"
+import researchRouter from "./routes/research"
 import connectDB from "./config/db"
 import { errorHandler } from "./middlewares/errorHandler"
 import multerMiddleware from "./config/multer"
@@ -42,6 +43,7 @@ app.use("/user", userRouter)
 app.use("/log", logRouter)
 app.use("/kewenangan", kewenanganRouter)
 app.use("/notification", notificationRouter)
+app.use("/research", researchRouter)
 app.use("/uploads/avatar", express.static(import.meta.dir + `/uploads/avatar`));
 app.use("/uploads/notification", express.static(import.meta.dir + `/uploads/notification`));
 
