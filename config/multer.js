@@ -11,6 +11,8 @@ const multerMiddleware = multer({
         uploadPath += 'avatar';
       } else if (file.fieldname === 'foto') {
         uploadPath += 'notification';
+      } else if (file.fieldname === 'document') {
+        uploadPath += 'document';
       } else {
         uploadPath += 'default';
       }

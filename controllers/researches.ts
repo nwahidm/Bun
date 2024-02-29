@@ -1,11 +1,11 @@
 import { type NextFunction, type Request, type Response } from "express"
-import { Research } from "../models/research"
+import { Research } from "../models/researches"
 
-export const fetchAllResearch = async (req: Request, res: Response, next: NextFunction) => {
+export const fetchAllResearches = async (req: Request, res: Response, next: NextFunction) => {
     console.log("[FETCH ALL RESEARCH]")
 
     try {
-        const researchs = await Research.find()
+        const researchs = await Research.find().populate('warrantId')
 
         res.status(200).json({
             status: 200,
@@ -17,11 +17,12 @@ export const fetchAllResearch = async (req: Request, res: Response, next: NextFu
 }
 
 export const createResearch = async (req: Request, res: Response, next: NextFunction) => {
-    const { lapinsus,advice, follow_up, threats, interference, barrier, challenges } = req.body
-    console.log("[CREATE RESEARCH]", lapinsus, advice, follow_up, threats, interference, barrier, challenges)
+    const { warrantId, lapinsus,advice, follow_up, threats, interference, barrier, challenges } = req.body
+    console.log("[CREATE RESEARCH]", warrantId, lapinsus, advice, follow_up, threats, interference, barrier, challenges)
 
     try {
         const newResearch = new Research({
+            warrantId,
             lapinsus,
             advice,
             follow_up,
@@ -48,7 +49,7 @@ export const fetchResearchDetail = async (req: Request, res: Response, next: Nex
 
     try {
         //Check whether the research exist or not
-        const research = await Research.findById(id)
+        const research = await Research.findById(id).populate('warrantId')
 
         if (!research) {
             throw {

@@ -1,7 +1,8 @@
-import { Schema, type InferSchemaType, model } from "mongoose"
+import mongoose, { Schema, type InferSchemaType, model } from "mongoose"
 
 const researchSchema = new Schema(
     {
+        warrantId: { type: mongoose.Types.ObjectId, ref: "Warrant", required: true },
         lapinsus: {
             description: { type: String },
         },
