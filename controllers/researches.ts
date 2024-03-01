@@ -1,11 +1,16 @@
 import { type NextFunction, type Request, type Response } from "express"
 import { Research } from "../models/researches"
+const url = "http://paket2.kejaksaan.info:5025/"
 
 export const fetchAllResearches = async (req: Request, res: Response, next: NextFunction) => {
     console.log("[FETCH ALL RESEARCH]")
 
     try {
         const researchs = await Research.find().populate('warrantId')
+
+        for (let i of researchs) {
+            (<any>i).warrantId.document = url + (<any>i).warrantId.document
+        }
 
         res.status(200).json({
             status: 200,
@@ -57,6 +62,8 @@ export const fetchResearchDetail = async (req: Request, res: Response, next: Nex
                 message: "Research tidak ditemukan"
             }
         }
+
+        (<any>research).warrantId.document = url + (<any>research).warrantId.document
 
         res.status(200).json({
             status: 200,
