@@ -8,6 +8,8 @@ export const fetchAllWarrants = async (req: Request, res: Response, next: NextFu
 
     try {
         const warrants = await Warrant.find()
+        const totalOpenWarrant = await Warrant.countDocuments({ warrantType: 0 })
+        const totalCloseWarrant = await Warrant.countDocuments({ warrantType: 1 })
 
         for (let i of warrants) {
             i.document = url + i.document
@@ -15,7 +17,7 @@ export const fetchAllWarrants = async (req: Request, res: Response, next: NextFu
 
         res.status(200).json({
             status: 200,
-            data: warrants
+            data: { totalOpenWarrant, totalCloseWarrant, warrants }
         })
     } catch (error) {
         next(error)
