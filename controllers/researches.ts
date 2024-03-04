@@ -22,7 +22,7 @@ export const fetchAllResearches = async (req: Request, res: Response, next: Next
 }
 
 export const createResearch = async (req: Request, res: Response, next: NextFunction) => {
-    const { warrantId, lapinsus,advice, follow_up, threats, interference, barrier, challenges } = req.body
+    const { warrantId, lapinsus, advice, follow_up, threats, interference, barrier, challenges } = req.body
     console.log("[CREATE RESEARCH]", warrantId, lapinsus, advice, follow_up, threats, interference, barrier, challenges)
 
     try {
