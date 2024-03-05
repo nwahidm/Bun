@@ -204,12 +204,12 @@ export const userProfile = async (req: JWTRequest, res: Response, next: NextFunc
 
 export const updateProfile = async (req: JWTRequest, res: Response, next: NextFunction) => {
     const { _id, browser, os, ip } = req.user!
-    const { username, password, email, nama_lengkap, nip, jenis_kelamin } = req.body
+    const { username, currentPassword, password, repassword, email, nama_lengkap, nip, jenis_kelamin } = req.body
     let avatar
     if (req.files && (req.files as MulterFiles)['avatar']) {
         avatar = (req.files as MulterFiles)['avatar'][0].path
     }
-    console.log("[UPDATE PROFILE]", username, password, email, nama_lengkap, nip, jenis_kelamin, avatar)
+    console.log("[UPDATE PROFILE]", username, currentPassword, password, repassword, email, nama_lengkap, nip, jenis_kelamin, avatar)
 
     try {
         //Check whether the user exists or not
@@ -227,12 +227,29 @@ export const updateProfile = async (req: JWTRequest, res: Response, next: NextFu
         if (username) updatedData = { ...updatedData, username }
         if (email) updatedData = { ...updatedData, email }
         if (password) {
+            //Check whether the password is correct
+            const isMatch = await Bun.password.verify(currentPassword, targetUser!.password)
+
+            if (!isMatch) {
+                throw {
+                    name: "Invalid",
+                    message: "password salah"
+                }
+            }
+            //Check whether the password is match with repassword or not
+            if (password !== repassword) {
+                throw {
+                    name: "Didn't Match",
+                    message: "Password dan repassword tidak sesuai"
+                }
+            }
+
             const hashPassword = await Bun.password.hash(password, {
                 algorithm: "bcrypt",
                 cost: 4,
             })
 
-            updatedData = { ...updatedData, hashPassword }
+            updatedData = { ...updatedData, password: hashPassword }
         }
         if (avatar) updatedData = { ...updatedData, avatar }
         if (nama_lengkap) updatedData = { ...updatedData, nama_lengkap }
@@ -263,14 +280,19 @@ export const updateProfile = async (req: JWTRequest, res: Response, next: NextFu
 }
 
 export const fetchAllUsers = async (req: JWTRequest, res: Response, next: NextFunction) => {
-    const { username, email, limit, offset } = req.body
-    console.log("[FETCH ALL USERS]", username, email, limit, offset)
+    const { username, email, nip, limit, offset } = req.body
+    console.log("[FETCH ALL USERS]", username, email, nip, limit, offset)
 
     try {
         //Search query
         let where = {}
         if (username) where = { ...where, username }
         if (email) where = { ...where, email }
+        if (nip) where = { ...where, nip: { $regex: nip, $options: 'i' } }
+
+        const totalUser = await User.countDocuments({})
+        const totalActiveUser = await User.countDocuments({enabled: true})
+        const totalDeactiveUser = await User.countDocuments({enabled: false})
 
         const users = await User.find(where).skip(offset).limit(limit).populate('kewenangan_id', 'deskripsi')
 
@@ -282,7 +304,7 @@ export const fetchAllUsers = async (req: JWTRequest, res: Response, next: NextFu
 
         res.status(200).json({
             status: 200,
-            data: users
+            data: {totalUser, totalActiveUser, totalDeactiveUser, users}
         })
     } catch (error) {
         next(error)
@@ -327,12 +349,12 @@ export const fetchUserDetail = async (req: Request, res: Response, next: NextFun
 export const updateUser = async (req: JWTRequest, res: Response, next: NextFunction) => {
     const { _id, browser, os, ip } = req.user!
     const id = req.params.id
-    const { username, email, password, repassword, nama_lengkap, nip, jenis_kelamin, kewenangan_id } = req.body
+    const { username, email, currentPassword, password, repassword, nama_lengkap, nip, jenis_kelamin, kewenangan_id, enabled } = req.body
     let avatar
     if (req.files && (req.files as MulterFiles)['avatar']) {
         avatar = (req.files as MulterFiles)['avatar'][0].path
     }
-    console.log("[UPDATE USER]", _id, id, username, email, password, repassword, nama_lengkap, nip, jenis_kelamin, kewenangan_id, avatar)
+    console.log("[UPDATE USER]", _id, id, username, email, currentPassword, password, repassword, nama_lengkap, nip, jenis_kelamin, kewenangan_id, enabled, avatar)
 
     try {
         //Check whether the user exists or not
@@ -351,6 +373,15 @@ export const updateUser = async (req: JWTRequest, res: Response, next: NextFunct
         if (email) updatedData = { ...updatedData, email }
         if (avatar) updatedData = { ...updatedData, avatar }
         if (password) {
+            //Check whether the password is correct
+            const isMatch = await Bun.password.verify(currentPassword, targetUser!.password)
+
+            if (!isMatch) {
+                throw {
+                    name: "Invalid",
+                    message: "password salah"
+                }
+            }
             //Check whether the password is match with repassword or not
             if (password !== repassword) {
                 throw {
@@ -370,6 +401,13 @@ export const updateUser = async (req: JWTRequest, res: Response, next: NextFunct
         if (nip) updatedData = { ...updatedData, nip }
         if (jenis_kelamin) updatedData = { ...updatedData, jenis_kelamin }
         if (kewenangan_id) updatedData = { ...updatedData, kewenangan_id }
+        if (enabled) {
+            if (enabled == "true") {
+                updatedData = { ...updatedData, enabled: true }
+            } else {
+                updatedData = { ...updatedData, enabled: false }
+            }
+        }
 
         //Update User
         await User.updateOne({ _id: id }, { $set: updatedData })
