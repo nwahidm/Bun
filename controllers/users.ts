@@ -286,7 +286,7 @@ export const fetchAllUsers = async (req: JWTRequest, res: Response, next: NextFu
     try {
         //Search query
         let where = {}
-        if (username) where = { ...where, username }
+        if (username) where = { ...where, username: { $regex: username, $options: 'i' } }
         if (email) where = { ...where, email }
         if (nip) where = { ...where, nip: { $regex: nip, $options: 'i' } }
 

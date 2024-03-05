@@ -3,6 +3,7 @@ import { Notification } from "../models/notifications"
 import { User } from "../models/users"
 import type { MulterFiles } from "./users"
 import type { JWTRequest } from "../middlewares/middlewares"
+import moment from "moment"
 // const url = "http://192.168.40.2:5025/"
 const url = "http://paket2.kejaksaan.info:5025/"
 
@@ -52,10 +53,20 @@ export const createNotification = async (req: Request, res: Response, next: Next
 }
 
 export const fetchAllNotification = async (req: Request, res: Response, next: NextFunction) => {
-    console.log("[FETCH ALL NOTIFICATIONS]")
+    const { judul, startDate, endDate } = req.body
+    console.log("[FETCH ALL NOTIFICATIONS]", judul, startDate, endDate)
 
     try {
-        const notifications = await Notification.find()
+        let where = {}
+        if (judul) where = { ...where, judul: { $regex: judul, $options: 'i' } }
+        if (startDate && endDate) {
+            where = {...where, createdAt: {
+                $gte: moment(startDate).startOf("day").format(),
+                $lte: moment(endDate).endOf("day").format(),
+              }}
+        }
+
+        const notifications = await Notification.find(where)
 
         for (let i of notifications) {
             i.foto = url + i.foto
