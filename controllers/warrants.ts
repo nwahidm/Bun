@@ -1,13 +1,26 @@
 import { type NextFunction, type Request, type Response } from "express"
 import { Warrant } from "../models/warrants"
 import type { MulterFiles } from "./users"
+import moment from "moment"
 const url = "http://paket2.kejaksaan.info:5025/"
 
 export const fetchAllWarrants = async (req: Request, res: Response, next: NextFunction) => {
-    console.log("[FETCH ALL WARRANTS]")
+    const { warrantNumber, description, warrantType, startDate, endDate } = req.body
+    console.log("[FETCH ALL WARRANTS]", warrantNumber, description, warrantType)
 
     try {
-        const warrants = await Warrant.find()
+        let where = {}
+        if (warrantNumber) where = { ...where, warrantNumber: { $regex: warrantNumber, $options: 'i' } }
+        if (description) where = { ...where, description: { $regex: description, $options: 'i' } }
+        if (warrantType) where = { ...where, warrantType }
+        if (startDate && endDate) {
+            where = {...where, createdAt: {
+                $gte: moment(startDate).startOf("day").format(),
+                $lte: moment(endDate).endOf("day").format(),
+              }}
+        }
+
+        const warrants = await Warrant.find(where)
         const totalOpenWarrant = await Warrant.countDocuments({ warrantType: 0 })
         const totalCloseWarrant = await Warrant.countDocuments({ warrantType: 1 })
 
