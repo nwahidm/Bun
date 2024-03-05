@@ -1,12 +1,22 @@
 import { type NextFunction, type Request, type Response } from "express"
 import { Research } from "../models/researches"
+import moment from "moment"
 const url = "http://paket2.kejaksaan.info:5025/"
 
 export const fetchAllResearches = async (req: Request, res: Response, next: NextFunction) => {
-    console.log("[FETCH ALL RESEARCH]")
+    const { startDate, endDate } = req.body
+    console.log("[FETCH ALL RESEARCH]", startDate, endDate)
 
     try {
-        const researchs = await Research.find().populate('warrantId')
+        let where = {}
+        if (startDate && endDate) {
+            where = {...where, createdAt: {
+                $gte: moment(startDate).startOf("day").format(),
+                $lte: moment(endDate).endOf("day").format(),
+              }}
+        }
+
+        const researchs = await Research.find(where).populate('warrantId')
 
         for (let i of researchs) {
             (<any>i).warrantId.document = url + (<any>i).warrantId.document
