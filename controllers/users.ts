@@ -56,7 +56,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             nama_lengkap,
             nip,
             jenis_kelamin,
-            kewenangan_id: "65b0bed13ef8cf0cd2ea3223",
+            kewenangan_id: "65c25f127304819438bf884d",
             avatar,
             enabled: false
         })
@@ -173,7 +173,7 @@ export const userProfile = async (req: JWTRequest, res: Response, next: NextFunc
 
     try {
         //Check whether the user exists or not
-        const targetUser = await User.findById(req.user?._id).populate("kewenangan_id")
+        const targetUser = await User.findById(req.user?._id)
 
         if (!targetUser) {
             throw {
@@ -317,7 +317,7 @@ export const fetchUserDetail = async (req: Request, res: Response, next: NextFun
 
     try {
         //Check whether the user exists or not
-        const targetUser = await User.findById(_id).populate("kewenangan_id")
+        const targetUser = await User.findById(_id)
 
         if (!targetUser) {
             throw {
