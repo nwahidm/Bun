@@ -66,7 +66,7 @@ export const fetchAllNotification = async (req: Request, res: Response, next: Ne
               }}
         }
 
-        const notifications = await Notification.find(where)
+        const notifications = await Notification.find(where).sort([['createdAt', 'desc']])
 
         for (let i of notifications) {
             i.foto = url + i.foto

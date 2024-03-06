@@ -16,7 +16,7 @@ export const fetchAllResearches = async (req: Request, res: Response, next: Next
               }}
         }
 
-        const researchs = await Research.find(where).populate('warrantId')
+        const researchs = await Research.find(where).populate('warrantId').sort([['createdAt', 'desc']])
 
         for (let i of researchs) {
             (<any>i).warrantId.document = url + (<any>i).warrantId.document

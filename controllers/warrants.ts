@@ -20,7 +20,7 @@ export const fetchAllWarrants = async (req: Request, res: Response, next: NextFu
               }}
         }
 
-        const warrants = await Warrant.find(where)
+        const warrants = await Warrant.find(where).sort([['createdAt', 'desc']])
         const totalOpenWarrant = await Warrant.countDocuments({ warrantType: 0 })
         const totalCloseWarrant = await Warrant.countDocuments({ warrantType: 1 })
 

@@ -44,7 +44,7 @@ export const fetchAllLogs = async (req: Request, res: Response, next: NextFuncti
         if (activity) where = { ...where, activity: { $regex: activity, $options: "i" } }
         if (user_id) where = { ...where, user_id }
 
-        const logs = await LogActivity.find(where).skip(offset).limit(limit).populate("user_id", 'nama_lengkap')
+        const logs = await LogActivity.find(where).sort([['createdAt', 'desc']]).skip(offset).limit(limit).populate("user_id", 'nama_lengkap')
 
         res.status(200).json({
             status: 200,
