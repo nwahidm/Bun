@@ -150,34 +150,37 @@ export const deleteWarrant = async (req: Request, res: Response, next: NextFunct
             }
         }
 
-        const researchs = await Research.find({ warrantId: _id })
+        // const researchs = await Research.find({ warrantId: _id })
 
-        if (researchs) {
-            throw {
-                name: "Forbidden",
-                message: "Warrant tersebut digunakan di salah satu penelitian"
-            }
-        }
+        // if (researchs) {
+        //     throw {
+        //         name: "Forbidden",
+        //         message: "Warrant tersebut digunakan di salah satu penelitian"
+        //     }
+        // }
 
-        const interviews = await Interview.find({ warrantId: _id })
+        // const interviews = await Interview.find({ warrantId: _id })
 
-        if (interviews) {
-            throw {
-                name: "Forbidden",
-                message: "Warrant tersebut digunakan di salah satu interview"
-            }
-        }
+        // if (interviews) {
+        //     throw {
+        //         name: "Forbidden",
+        //         message: "Warrant tersebut digunakan di salah satu interview"
+        //     }
+        // }
 
-        const interrogations = await Interrogation.find({ warrantId: _id })
+        // const interrogations = await Interrogation.find({ warrantId: _id })
 
-        if (interviews) {
-            throw {
-                name: "Forbidden",
-                message: "Warrant tersebut digunakan di salah satu interogasi"
-            }
-        }
+        // if (interrogations) {
+        //     throw {
+        //         name: "Forbidden",
+        //         message: "Warrant tersebut digunakan di salah satu interogasi"
+        //     }
+        // }
 
         await Warrant.deleteOne({ _id })
+        await Research.deleteMany({warrantId: _id})
+        await Interview.deleteMany({warrantId: _id})
+        await Interrogation.deleteMany({warrantId: _id})
 
         res.status(200).json({
             status: 200,

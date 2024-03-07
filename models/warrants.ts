@@ -1,4 +1,5 @@
 import { Schema, type InferSchemaType, model } from "mongoose"
+import { Research } from "./researches"
 
 const warrantSchema = new Schema(
     {
