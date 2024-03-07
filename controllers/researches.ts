@@ -16,15 +16,17 @@ export const fetchAllResearches = async (req: Request, res: Response, next: Next
               }}
         }
 
-        const researchs = await Research.find(where).populate('warrantId').sort([['createdAt', 'desc']])
+        const researches = await Research.find(where).populate('warrantId').sort([['createdAt', 'desc']])
 
-        for (let i of researchs) {
-            (<any>i).warrantId.document = url + (<any>i).warrantId.document
+        for (let i of researches) {
+            if (!((<any>i).warrantId.document).startsWith(url)) {
+                (<any>i).warrantId.document = url + (<any>i).warrantId.document;
+            }
         }
 
         res.status(200).json({
             status: 200,
-            data: researchs
+            data: researches
         })
     } catch (error) {
         next(error)

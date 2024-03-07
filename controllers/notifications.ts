@@ -4,7 +4,6 @@ import { User } from "../models/users"
 import type { MulterFiles } from "./users"
 import type { JWTRequest } from "../middlewares/middlewares"
 import moment from "moment"
-// const url = "http://192.168.40.2:5025/"
 const url = "http://paket2.kejaksaan.info:5025/"
 
 

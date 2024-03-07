@@ -10,7 +10,9 @@ export const fetchAllInterviews = async (req: Request, res: Response, next: Next
         const interviews = await Interview.find().populate('warrantId').sort([['createdAt', 'desc']])
 
         for (let i of interviews) {
-            (<any>i).warrantId.document = url + (<any>i).warrantId.document
+            if (!((<any>i).warrantId.document).startsWith(url)) {
+                (<any>i).warrantId.document = url + (<any>i).warrantId.document;
+            }
         }
 
         res.status(200).json({
