@@ -28,6 +28,9 @@ export const errorHandler = (error: Error, req: Request, res: Response, next: Ne
     } else if (error.name == "Not Found") {
         status = 404
         message = error.message
+    } else if (error.name == "Forbidden") {
+        status = 403
+        message = error.message
     }
 
     res.status(status).json({ status, message })

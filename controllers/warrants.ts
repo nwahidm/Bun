@@ -2,6 +2,9 @@ import { type NextFunction, type Request, type Response } from "express"
 import { Warrant } from "../models/warrants"
 import type { MulterFiles } from "./users"
 import moment from "moment"
+import { Research } from "../models/researches"
+import { Interview } from "../models/interviews"
+import { Interrogation } from "../models/interrogations"
 const url = "http://paket2.kejaksaan.info:5025/"
 
 export const fetchAllWarrants = async (req: Request, res: Response, next: NextFunction) => {
@@ -14,10 +17,12 @@ export const fetchAllWarrants = async (req: Request, res: Response, next: NextFu
         if (description) where = { ...where, description: { $regex: description, $options: 'i' } }
         if (warrantType) where = { ...where, warrantType }
         if (startDate && endDate) {
-            where = {...where, createdAt: {
-                $gte: moment(startDate).startOf("day").format(),
-                $lte: moment(endDate).endOf("day").format(),
-              }}
+            where = {
+                ...where, createdAt: {
+                    $gte: moment(startDate).startOf("day").format(),
+                    $lte: moment(endDate).endOf("day").format(),
+                }
+            }
         }
 
         const warrants = await Warrant.find(where).sort([['createdAt', 'desc']])
@@ -142,6 +147,33 @@ export const deleteWarrant = async (req: Request, res: Response, next: NextFunct
             throw {
                 name: "Not Found",
                 message: "Warrant tidak ditemukan"
+            }
+        }
+
+        const researchs = await Research.find({ warrantId: _id })
+
+        if (researchs) {
+            throw {
+                name: "Forbidden",
+                message: "Warrant tersebut digunakan di salah satu penelitian"
+            }
+        }
+
+        const interviews = await Interview.find({ warrantId: _id })
+
+        if (interviews) {
+            throw {
+                name: "Forbidden",
+                message: "Warrant tersebut digunakan di salah satu interview"
+            }
+        }
+
+        const interrogations = await Interrogation.find({ warrantId: _id })
+
+        if (interviews) {
+            throw {
+                name: "Forbidden",
+                message: "Warrant tersebut digunakan di salah satu interogasi"
             }
         }
 
