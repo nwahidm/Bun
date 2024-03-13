@@ -4,16 +4,20 @@ import moment from "moment"
 const url = "http://paket2.kejaksaan.info:5025/"
 
 export const fetchAllResearches = async (req: Request, res: Response, next: NextFunction) => {
-    const { startDate, endDate } = req.body
-    console.log("[FETCH ALL RESEARCH]", startDate, endDate)
+    const { name, status, startDate, endDate } = req.body
+    console.log("[FETCH ALL RESEARCH]", name, status, startDate, endDate)
 
     try {
         let where = {}
+        if (name) where = { ...where, name: { $regex: name, $options: 'i' } }
+        if (status) where = { ...where, status }
         if (startDate && endDate) {
-            where = {...where, createdAt: {
-                $gte: moment(startDate).startOf("day").format(),
-                $lte: moment(endDate).endOf("day").format(),
-              }}
+            where = {
+                ...where, createdAt: {
+                    $gte: moment(startDate).startOf("day").format(),
+                    $lte: moment(endDate).endOf("day").format(),
+                }
+            }
         }
 
         const researches = await Research.find(where).populate('warrantId').sort([['createdAt', 'desc']])
@@ -34,19 +38,21 @@ export const fetchAllResearches = async (req: Request, res: Response, next: Next
 }
 
 export const createResearch = async (req: Request, res: Response, next: NextFunction) => {
-    const { warrantId, lapinsus, advice, follow_up, threats, interference, barrier, challenges } = req.body
-    console.log("[CREATE RESEARCH]", warrantId, lapinsus, advice, follow_up, threats, interference, barrier, challenges)
+    const { warrantId, name, lapinsus, advice, follow_up, threats, interference, barrier, challenges } = req.body
+    console.log("[CREATE RESEARCH]", warrantId, name, lapinsus, advice, follow_up, threats, interference, barrier, challenges)
 
     try {
         const newResearch = new Research({
             warrantId,
+            name,
             lapinsus,
             advice,
             follow_up,
             threats,
             interference,
             barrier,
-            challenges
+            challenges,
+            status: 0
         })
 
         await newResearch.save()
@@ -88,8 +94,8 @@ export const fetchResearchDetail = async (req: Request, res: Response, next: Nex
 
 export const updateResearch = async (req: Request, res: Response, next: NextFunction) => {
     const _id = req.params.id
-    const { advice, follow_up, threats, interference, barrier, challenges } = req.body
-    console.log("[UPDATE RESEARCH]", advice, follow_up, threats, interference, barrier, challenges)
+    const { name, lapinsus, advice, follow_up, threats, interference, barrier, challenges, status } = req.body
+    console.log("[UPDATE RESEARCH]", name, lapinsus, advice, follow_up, threats, interference, barrier, challenges, status)
 
     try {
         //Check whether the research exist or not
@@ -104,12 +110,15 @@ export const updateResearch = async (req: Request, res: Response, next: NextFunc
 
         //Updated Data
         let updatedData = {}
+        if (name) updatedData = { ...updatedData, name }
+        if (lapinsus) updatedData = { ...updatedData, lapinsus }
         if (advice) updatedData = { ...updatedData, advice }
         if (follow_up) updatedData = { ...updatedData, follow_up }
         if (threats) updatedData = { ...updatedData, threats }
         if (interference) updatedData = { ...updatedData, interference }
         if (barrier) updatedData = { ...updatedData, barrier }
         if (challenges) updatedData = { ...updatedData, challenges }
+        if (status) updatedData = { ...updatedData, status }
 
         //Update Research
         await Research.updateOne({ _id }, { $set: updatedData })

@@ -4,16 +4,23 @@ import moment from "moment"
 const url = "http://paket2.kejaksaan.info:5025/"
 
 export const fetchAllInterrogations = async (req: Request, res: Response, next: NextFunction) => {
-    console.log("[FETCH ALL INTERROGATIONS]")
+    const { name, status, startDate, endDate } = req.body
+    console.log("[FETCH ALL INTERROGATIONS]", name, status, startDate, endDate)
 
     try {
-        const interrogations = await Interrogation.find().populate('warrantId').sort([['createdAt', 'desc']])
-
-        for (let i of interrogations) {
-            if (!((<any>i).warrantId.document).startsWith(url)) {
-                (<any>i).warrantId.document = url + (<any>i).warrantId.document;
+        let where = {}
+        if (name) where = { ...where, name: { $regex: name, $options: 'i' } }
+        if (status) where = { ...where, status }
+        if (startDate && endDate) {
+            where = {
+                ...where, createdAt: {
+                    $gte: moment(startDate).startOf("day").format(),
+                    $lte: moment(endDate).endOf("day").format(),
+                }
             }
         }
+
+        const interrogations = await Interrogation.find(where).populate('interviewId', 'name').sort([['createdAt', 'desc']])
 
         res.status(200).json({
             status: 200,
@@ -25,15 +32,17 @@ export const fetchAllInterrogations = async (req: Request, res: Response, next: 
 }
 
 export const createInterrogation = async (req: Request, res: Response, next: NextFunction) => {
-    const { warrantId, record, targetIdentification, result } = req.body
-    console.log("[CREATE INTERROGATION]", warrantId, record, targetIdentification, result)
+    const { interviewId, name, record, targetIdentification, result } = req.body
+    console.log("[CREATE INTERROGATION]", interviewId, name, record, targetIdentification, result)
 
     try {
         const newInterrogation = new Interrogation({
-            warrantId,
+            interviewId,
+            name,
             record,
             targetIdentification,
-            result
+            result,
+            status: 0
         })
 
         await newInterrogation.save()
@@ -53,7 +62,7 @@ export const fetchInterrogationDetail = async (req: Request, res: Response, next
 
     try {
         //Check whether the interrogation exist or not
-        const interrogation = await Interrogation.findById(id).populate('warrantId')
+        const interrogation = await Interrogation.findById(id).populate('interviewId', 'name')
 
         if (!interrogation) {
             throw {
@@ -61,8 +70,6 @@ export const fetchInterrogationDetail = async (req: Request, res: Response, next
                 message: "Interrogation tidak ditemukan"
             }
         }
-
-        (<any>interrogation).warrantId.document = url + (<any>interrogation).warrantId.document
 
         res.status(200).json({
             status: 200,
@@ -75,8 +82,8 @@ export const fetchInterrogationDetail = async (req: Request, res: Response, next
 
 export const updateInterrogation = async (req: Request, res: Response, next: NextFunction) => {
     const _id = req.params.id
-    const { record, targetIdentification, result } = req.body
-    console.log("[UPDATE INTERROGATION]", record, targetIdentification, result)
+    const { name, record, targetIdentification, result, status } = req.body
+    console.log("[UPDATE INTERROGATION]", name, record, targetIdentification, result, status)
 
     try {
         //Check whether the interrogation exist or not
@@ -91,9 +98,11 @@ export const updateInterrogation = async (req: Request, res: Response, next: Nex
 
         //Updated Data
         let updatedData = {}
+        if (name) updatedData = { ...updatedData, name }
         if (record) updatedData = { ...updatedData, record }
         if (targetIdentification) updatedData = { ...updatedData, targetIdentification }
         if (result) updatedData = { ...updatedData, result }
+        if (status) updatedData = { ...updatedData, status }
 
         //Update Interrogation
         await Interrogation.updateOne({ _id }, { $set: updatedData })

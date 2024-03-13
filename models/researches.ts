@@ -3,6 +3,7 @@ import mongoose, { Schema, type InferSchemaType, model } from "mongoose"
 const researchSchema = new Schema(
     {
         warrantId: { type: mongoose.Types.ObjectId, ref: "Warrant", required: true },
+        name: { type: String },
         lapinsus: {
             description: { type: String },
         },
@@ -12,6 +13,7 @@ const researchSchema = new Schema(
         interference: { type: String },
         barrier: { type: String },
         challenges: { type: String },
+        status: { type: Number }
     },
     {
         versionKey: false,

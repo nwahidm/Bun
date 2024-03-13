@@ -4,16 +4,23 @@ import moment from "moment"
 const url = "http://paket2.kejaksaan.info:5025/"
 
 export const fetchAllInterviews = async (req: Request, res: Response, next: NextFunction) => {
-    console.log("[FETCH ALL INTERVIEWS]")
+    const { name, status, startDate, endDate } = req.body
+    console.log("[FETCH ALL INTERVIEWS]", name, status, startDate, endDate)
 
     try {
-        const interviews = await Interview.find().populate('warrantId').sort([['createdAt', 'desc']])
-
-        for (let i of interviews) {
-            if (!((<any>i).warrantId.document).startsWith(url)) {
-                (<any>i).warrantId.document = url + (<any>i).warrantId.document;
+        let where = {}
+        if (name) where = { ...where, name: { $regex: name, $options: 'i' } }
+        if (status) where = { ...where, status }
+        if (startDate && endDate) {
+            where = {
+                ...where, createdAt: {
+                    $gte: moment(startDate).startOf("day").format(),
+                    $lte: moment(endDate).endOf("day").format(),
+                }
             }
         }
+
+        const interviews = await Interview.find(where).populate('researchId', 'name').sort([['createdAt', 'desc']])
 
         res.status(200).json({
             status: 200,
@@ -25,16 +32,18 @@ export const fetchAllInterviews = async (req: Request, res: Response, next: Next
 }
 
 export const createInterview = async (req: Request, res: Response, next: NextFunction) => {
-    const { warrantId, schedule, advice, follow_up, result } = req.body
-    console.log("[CREATE INTERVIEW]", warrantId, schedule, advice, follow_up, result)
+    const { researchId, name, schedule, advice, follow_up, result } = req.body
+    console.log("[CREATE INTERVIEW]", researchId, name, schedule, advice, follow_up, result)
 
     try {
         const newInterview = new Interview({
-            warrantId,
+            researchId,
+            name,
             schedule: moment(schedule).format(),
             advice,
             follow_up,
-            result
+            result,
+            status: 0
         })
 
         await newInterview.save()
@@ -50,11 +59,11 @@ export const createInterview = async (req: Request, res: Response, next: NextFun
 
 export const fetchInterviewDetail = async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id
-    console.log("[FETCH Interview DETAIL]", id)
+    console.log("[FETCH INTERVIEW DETAIL]", id)
 
     try {
         //Check whether the interview exist or not
-        const interview = await Interview.findById(id).populate('warrantId')
+        const interview = await Interview.findById(id).populate('researchId', 'name')
 
         if (!interview) {
             throw {
@@ -62,8 +71,6 @@ export const fetchInterviewDetail = async (req: Request, res: Response, next: Ne
                 message: "Interview tidak ditemukan"
             }
         }
-
-        (<any>interview).warrantId.document = url + (<any>interview).warrantId.document
 
         res.status(200).json({
             status: 200,
@@ -76,8 +83,8 @@ export const fetchInterviewDetail = async (req: Request, res: Response, next: Ne
 
 export const updateInterview = async (req: Request, res: Response, next: NextFunction) => {
     const _id = req.params.id
-    const { schedule, advice, follow_up, result } = req.body
-    console.log("[UPDATE Interview]", schedule, advice, follow_up, result)
+    const { name, schedule, advice, follow_up, result, status } = req.body
+    console.log("[UPDATE INTERVIEW]", name, schedule, advice, follow_up, result, status)
 
     try {
         //Check whether the interview exist or not
@@ -92,10 +99,12 @@ export const updateInterview = async (req: Request, res: Response, next: NextFun
 
         //Updated Data
         let updatedData = {}
+        if (name) updatedData = { ...updatedData, name }
         if (schedule) updatedData = { ...updatedData, schedule: moment(schedule).format() }
         if (advice) updatedData = { ...updatedData, advice }
         if (follow_up) updatedData = { ...updatedData, follow_up }
         if (result) updatedData = { ...updatedData, result }
+        if (status) updatedData = { ...updatedData, status }
 
         //Update Interview
         await Interview.updateOne({ _id }, { $set: updatedData })

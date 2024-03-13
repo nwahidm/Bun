@@ -2,7 +2,8 @@ import mongoose, { Schema, type InferSchemaType, model } from "mongoose"
 
 const interrogationSchema = new Schema(
     {
-        warrantId: { type: mongoose.Types.ObjectId, ref: "Warrant", required: true },
+        interviewId: { type: mongoose.Types.ObjectId, ref: "Interview", required: true },
+        name: { type: String },
         record: { type: String },
         targetIdentification: {
             name: { type: String },
@@ -10,7 +11,8 @@ const interrogationSchema = new Schema(
             height: { type: String },
             skinColor: { type: String }
         },
-        result: { type: String }
+        result: { type: String },
+        status: { type: Number }
     },
     {
         versionKey: false,

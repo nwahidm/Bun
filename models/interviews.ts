@@ -2,11 +2,13 @@ import mongoose, { Schema, type InferSchemaType, model } from "mongoose"
 
 const interviewSchema = new Schema(
     {
-        warrantId: { type: mongoose.Types.ObjectId, ref: "Warrant", required: true },
+        researchId: { type: mongoose.Types.ObjectId, ref: "Research", required: true },
+        name: { type: String },
         schedule: { type: Date },
         advice: { type: String },
         follow_up: { type: String },
-        result: { type: String }
+        result: { type: String },
+        status: { type: Number }
     },
     {
         versionKey: false,
