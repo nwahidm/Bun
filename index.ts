@@ -8,6 +8,7 @@ import researchRouter from "./routes/researches"
 import warrantRouter from "./routes/warrants"
 import interviewRouter from "./routes/interviews"
 import interrogationRouter from "./routes/interrogations"
+import elicitationRouter from "./routes/elicitations"
 import connectDB from "./config/db"
 import { errorHandler } from "./middlewares/errorHandler"
 import multerMiddleware from "./config/multer"
@@ -51,6 +52,7 @@ app.use("/warrant", warrantRouter)
 app.use("/research", researchRouter)
 app.use("/interview", interviewRouter)
 app.use("/interrogation", interrogationRouter)
+app.use("/elicitation", elicitationRouter)
 app.use("/uploads/avatar", express.static(import.meta.dir + `/uploads/avatar`))
 app.use("/uploads/notification", express.static(import.meta.dir + `/uploads/notification`))
 app.use("/uploads/document", express.static(import.meta.dir + `/uploads/document`))
