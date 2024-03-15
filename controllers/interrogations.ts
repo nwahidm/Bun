@@ -8,6 +8,10 @@ export const fetchAllInterrogations = async (req: Request, res: Response, next: 
     console.log("[FETCH ALL INTERROGATIONS]", name, status, startDate, endDate)
 
     try {
+        const totalNotYetFollowedUp = await Interrogation.countDocuments({ status: 0 })
+        const totalBeingFollowedUp = await Interrogation.countDocuments({ status: 1 })
+        const totalFollowedUp = await Interrogation.countDocuments({ status: 2 })
+
         let where = {}
         if (name) where = { ...where, name: { $regex: name, $options: 'i' } }
         if (status) where = { ...where, status }
@@ -24,7 +28,7 @@ export const fetchAllInterrogations = async (req: Request, res: Response, next: 
 
         res.status(200).json({
             status: 200,
-            data: interrogations
+            data: { totalNotYetFollowedUp, totalBeingFollowedUp, totalFollowedUp, interrogations }
         })
     } catch (error) {
         next(error)

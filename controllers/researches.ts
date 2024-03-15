@@ -8,6 +8,10 @@ export const fetchAllResearches = async (req: Request, res: Response, next: Next
     console.log("[FETCH ALL RESEARCH]", name, status, startDate, endDate)
 
     try {
+        const totalNotYetFollowedUp = await Research.countDocuments({ status: 0 })
+        const totalBeingFollowedUp = await Research.countDocuments({ status: 1 })
+        const totalFollowedUp = await Research.countDocuments({ status: 2 })
+
         let where = {}
         if (name) where = { ...where, name: { $regex: name, $options: 'i' } }
         if (status) where = { ...where, status }
@@ -30,7 +34,7 @@ export const fetchAllResearches = async (req: Request, res: Response, next: Next
 
         res.status(200).json({
             status: 200,
-            data: researches
+            data: { totalNotYetFollowedUp, totalBeingFollowedUp, totalFollowedUp, researches }
         })
     } catch (error) {
         next(error)
