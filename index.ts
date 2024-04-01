@@ -12,6 +12,7 @@ import elicitationRouter from "./routes/elicitations"
 import dashboardRouter from "./routes/dashboard"
 import observationRouter from "./routes/observations"
 import delineationRouter from "./routes/delineations"
+import explorationRouter from "./routes/explorations"
 import connectDB from "./config/db"
 import { errorHandler } from "./middlewares/errorHandler"
 import multerMiddleware from "./config/multer"
@@ -59,6 +60,7 @@ app.use("/elicitation", elicitationRouter)
 app.use("/dashboard", dashboardRouter)
 app.use("/observation", observationRouter)
 app.use("/delineation", delineationRouter)
+app.use("/exploration", explorationRouter)
 app.use("/uploads/avatar", express.static(import.meta.dir + `/uploads/avatar`))
 app.use("/uploads/notification", express.static(import.meta.dir + `/uploads/notification`))
 app.use("/uploads/document", express.static(import.meta.dir + `/uploads/document`))
