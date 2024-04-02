@@ -106,7 +106,15 @@ export const updateExploration = async (req: Request, res: Response, next: NextF
         //Updated Data
         let updatedData = {}
         if (name) updatedData = { ...updatedData, name }
-        if (plan) updatedData = { ...updatedData, plan }
+        if (plan) {
+
+            for (let i in plan) {
+                plan[i].start = moment(plan[i].start).format()
+                plan[i].end = moment(plan[i].end).format()
+            }
+
+            updatedData = { ...updatedData, plan }
+        }
         if (targetIdentity) updatedData = { ...updatedData, targetIdentity }
         if (result) updatedData = { ...updatedData, result }
         if (status) updatedData = { ...updatedData, status }
