@@ -7,8 +7,8 @@ const explorationSchema = new Schema(
         plan: [
             {
                 activity: String,
-                start: Date,
-                end: Date,
+                start: String,
+                end: String,
                 done: Boolean
             }
         ],

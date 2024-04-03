@@ -78,6 +78,11 @@ export const fetchExplorationDetail = async (req: Request, res: Response, next: 
             }
         }
 
+        exploration.plan.map((x) => {
+            (<any>x).start = moment((<any>x).start).format('DD-MMMM-YYYY'),
+            (<any>x).end = moment((<any>x).end).format('DD-MMMM-YYYY')
+        })
+        
         res.status(200).json({
             status: 200,
             data: exploration
