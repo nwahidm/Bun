@@ -1,6 +1,6 @@
 import express from "express"
 import { authMiddlewares } from "../middlewares/middlewares"
-import { createExploration, deleteExploration, fetchAllExplorations, fetchExplorationDetail, updateExploration } from "../controllers/explorations"
+import { addPlan, createExploration, deleteExploration, fetchAllExplorations, fetchExplorationDetail, updateExploration } from "../controllers/explorations"
 
 const router = express.Router()
 
@@ -9,5 +9,6 @@ router.post("/create", authMiddlewares, createExploration)
 router.get("/:id", authMiddlewares, fetchExplorationDetail)
 router.put("/:id", authMiddlewares, updateExploration)
 router.delete("/:id", authMiddlewares, deleteExploration)
+router.post("/:id/plan", authMiddlewares, addPlan)
 
 export default router

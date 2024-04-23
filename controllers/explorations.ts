@@ -23,7 +23,7 @@ export const fetchAllExplorations = async (req: Request, res: Response, next: Ne
             }
         }
 
-        const explorations = await Exploration.find(where).populate('delineationId').sort([['createdAt', 'desc']])
+        const explorations = await Exploration.find(where).populate('delineationId', 'name').sort([['createdAt', 'desc']])
 
         res.status(200).json({
             status: 200,
@@ -69,7 +69,7 @@ export const fetchExplorationDetail = async (req: Request, res: Response, next: 
 
     try {
         //Check whether the exploration exist or not
-        const exploration = await Exploration.findById(id).populate('delineationId')
+        const exploration = await Exploration.findById(id).populate('delineationId', 'name')
 
         if (!exploration) {
             throw {
@@ -80,9 +80,9 @@ export const fetchExplorationDetail = async (req: Request, res: Response, next: 
 
         exploration.plan.map((x) => {
             (<any>x).start = moment((<any>x).start).format('DD-MMMM-YYYY'),
-            (<any>x).end = moment((<any>x).end).format('DD-MMMM-YYYY')
+                (<any>x).end = moment((<any>x).end).format('DD-MMMM-YYYY')
         })
-        
+
         res.status(200).json({
             status: 200,
             data: exploration
@@ -156,6 +156,36 @@ export const deleteExploration = async (req: Request, res: Response, next: NextF
         res.status(200).json({
             status: 200,
             message: `Exploration dengan id ${_id} berhasil dihapus`
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const addPlan = async (req: Request, res: Response, next: NextFunction) => {
+    const _id = req.params.id
+    const { newPlan } = req.body
+    console.log("[ADD PLAN]", _id, newPlan);
+
+    try {
+        //Check whether the exploration exist or not
+        const exploration = await Exploration.findById(_id)
+
+        if (!exploration) {
+            throw {
+                name: "Not Found",
+                message: "Exploration tidak ditemukan"
+            }
+        }
+
+        await Exploration.updateOne(
+            { _id },
+            { $push: { plan: newPlan } },
+        );
+
+        res.status(200).json({
+            status: 200,
+            message: `Plan berhasil ditambahkan pada exploration dengan id ${_id}`
         })
     } catch (error) {
         next(error)

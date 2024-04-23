@@ -11,6 +11,28 @@ export type log = {
     ip: string
 }
 
+export const fetchAllLogs = async (req: Request, res: Response, next: NextFunction) => {
+    const { activity, user_id, limit, offset } = req.body
+    console.log("[FETCH ALL LOG ACTIVITIES]", activity, user_id)
+
+    try {
+        //Search Query
+        let where = {}
+        if (activity) where = { ...where, activity: { $regex: activity, $options: "i" } }
+        if (user_id) where = { ...where, user_id }
+
+        const logs = await LogActivity.find(where).sort([['createdAt', 'desc']]).skip(offset).limit(limit).populate("user_id", 'nama_lengkap')
+
+        res.status(200).json({
+            status: 200,
+            data: logs
+        })
+    } catch (error) {
+        next(error)
+    }
+
+}
+
 export const createLog = async (logData: log) => {
     const { activity, user_id, browser, os, ip } = logData
     console.log("[CREATE LOG ACTIVITY]", activity, user_id, browser, os, ip)
@@ -32,28 +54,6 @@ export const createLog = async (logData: log) => {
     } catch (error) {
         return error
     }
-}
-
-export const fetchAllLogs = async (req: Request, res: Response, next: NextFunction) => {
-    const { activity, user_id, limit, offset } = req.body
-    console.log("[FETCH ALL LOG ACTIVITIES]", activity, user_id)
-
-    try {
-        //Search Query
-        let where = {}
-        if (activity) where = { ...where, activity: { $regex: activity, $options: "i" } }
-        if (user_id) where = { ...where, user_id }
-
-        const logs = await LogActivity.find(where).sort([['createdAt', 'desc']]).skip(offset).limit(limit).populate("user_id", 'nama_lengkap')
-
-        res.status(200).json({
-            status: 200,
-            data: logs
-        })
-    } catch (error) {
-        next(error)
-    }
-
 }
 
 export const fetchLogDetail = async (req: Request, res: Response, next: NextFunction) => {

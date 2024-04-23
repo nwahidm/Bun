@@ -6,6 +6,34 @@ import type { JWTRequest } from "../middlewares/middlewares"
 import moment from "moment"
 const url = "http://paket2.kejaksaan.info:5025/"
 
+export const fetchAllNotification = async (req: Request, res: Response, next: NextFunction) => {
+    const { judul, startDate, endDate } = req.body
+    console.log("[FETCH ALL NOTIFICATIONS]", judul, startDate, endDate)
+
+    try {
+        let where = {}
+        if (judul) where = { ...where, judul: { $regex: judul, $options: 'i' } }
+        if (startDate && endDate) {
+            where = {...where, createdAt: {
+                $gte: moment(startDate).startOf("day").format(),
+                $lte: moment(endDate).endOf("day").format(),
+              }}
+        }
+
+        const notifications = await Notification.find(where).sort([['createdAt', 'desc']])
+
+        for (let i of notifications) {
+            i.foto = url + i.foto
+        }
+
+        res.status(200).json({
+            status: 200,
+            data: notifications
+        })
+    } catch (error) {
+        next(error)
+    }
+}
 
 export const createNotification = async (req: Request, res: Response, next: NextFunction) => {
     const { judul, isi, kewenangan_id } = req.body
@@ -45,35 +73,6 @@ export const createNotification = async (req: Request, res: Response, next: Next
         res.status(201).json({
             status: 201,
             message: "Notifikasi berhasil dibuat"
-        })
-    } catch (error) {
-        next(error)
-    }
-}
-
-export const fetchAllNotification = async (req: Request, res: Response, next: NextFunction) => {
-    const { judul, startDate, endDate } = req.body
-    console.log("[FETCH ALL NOTIFICATIONS]", judul, startDate, endDate)
-
-    try {
-        let where = {}
-        if (judul) where = { ...where, judul: { $regex: judul, $options: 'i' } }
-        if (startDate && endDate) {
-            where = {...where, createdAt: {
-                $gte: moment(startDate).startOf("day").format(),
-                $lte: moment(endDate).endOf("day").format(),
-              }}
-        }
-
-        const notifications = await Notification.find(where).sort([['createdAt', 'desc']])
-
-        for (let i of notifications) {
-            i.foto = url + i.foto
-        }
-
-        res.status(200).json({
-            status: 200,
-            data: notifications
         })
     } catch (error) {
         next(error)

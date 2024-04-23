@@ -23,7 +23,7 @@ export const fetchAllDelineations = async (req: Request, res: Response, next: Ne
             }
         }
 
-        const delineations = await Delineation.find(where).populate('observationId').sort([['createdAt', 'desc']])
+        const delineations = await Delineation.find(where).populate('observationId', 'name').sort([['createdAt', 'desc']])
 
         res.status(200).json({
             status: 200,
@@ -65,7 +65,7 @@ export const fetchDelineationDetail = async (req: Request, res: Response, next: 
 
     try {
         //Check whether the delineation exist or not
-        const delineation = await Delineation.findById(id).populate('observationId')
+        const delineation = await Delineation.findById(id).populate('observationId', 'name')
 
         if (!delineation) {
             throw {
