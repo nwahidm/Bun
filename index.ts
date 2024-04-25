@@ -14,6 +14,7 @@ import observationRouter from "./routes/observations"
 import delineationRouter from "./routes/delineations"
 import explorationRouter from "./routes/explorations"
 import tailingRouter from "./routes/tailings"
+import infiltrationRouter from "./routes/infiltrations"
 import connectDB from "./config/db"
 import { errorHandler } from "./middlewares/errorHandler"
 import multerMiddleware from "./config/multer"
@@ -63,6 +64,7 @@ app.use("/observation", observationRouter)
 app.use("/delineation", delineationRouter)
 app.use("/exploration", explorationRouter)
 app.use("/tailing", tailingRouter)
+app.use("/infiltration", infiltrationRouter)
 app.use("/uploads/avatar", express.static(import.meta.dir + `/uploads/avatar`))
 app.use("/uploads/notification", express.static(import.meta.dir + `/uploads/notification`))
 app.use("/uploads/document", express.static(import.meta.dir + `/uploads/document`))
