@@ -1,6 +1,6 @@
 import mongoose, { Schema, type InferSchemaType, model } from "mongoose"
 
-const intrutionSchema = new Schema(
+const intrusionSchema = new Schema(
     {
         infiltrationId: { type: mongoose.Types.ObjectId, ref: "Infiltration", required: true },
         name: { type: String },
@@ -18,5 +18,5 @@ const intrutionSchema = new Schema(
     }
 )
 
-export type Intrution = InferSchemaType<typeof intrutionSchema>
-export const Intrution = model("Intrution", intrutionSchema)
+export type Intrusion = InferSchemaType<typeof intrusionSchema>
+export const Intrusion = model("Intrusion", intrusionSchema)
