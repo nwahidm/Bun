@@ -1,11 +1,11 @@
 import { type NextFunction, type Request, type Response } from "express"
-import { Kewengangan } from "../models/kewenangan"
+import { Kewenangan } from "../models/kewenangan"
 
 export const fetchAllKewenangan = async (req : Request, res: Response, next: NextFunction) => {
     console.log("[FETCH ALL KEWENANGAN]")
     
     try {
-        const kewenangans = await Kewengangan.find()
+        const kewenangans = await Kewenangan.find()
 
         res.status(200).json({
             status: 200,
@@ -22,7 +22,7 @@ export const createKewenangan = async (req: Request, res: Response, next: NextFu
 
     try {
         //Check whether kewenangan already exists or not
-        const checkKewenangan = await Kewengangan.findOne({deskripsi})
+        const checkKewenangan = await Kewenangan.findOne({deskripsi})
 
         if (checkKewenangan) {
             throw {
@@ -31,7 +31,7 @@ export const createKewenangan = async (req: Request, res: Response, next: NextFu
             }
         }
 
-        const newKewenangan = new Kewengangan({
+        const newKewenangan = new Kewenangan({
             deskripsi
         })
 

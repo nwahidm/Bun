@@ -1,5 +1,6 @@
 import express from "express"
 import indexRouter from "./routes/index"
+import satkerRouter from "./routes/satker"
 import userRouter from "./routes/users"
 import logRouter from "./routes/log_activities"
 import kewenanganRouter from "./routes/kewenangan"
@@ -52,6 +53,7 @@ app.use(async (req, res, next) => {
 });
 
 app.use("/", indexRouter)
+app.use("/satker", satkerRouter)
 app.use("/user", userRouter)
 app.use("/log", logRouter)
 app.use("/kewenangan", kewenanganRouter)

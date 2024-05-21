@@ -10,5 +10,5 @@ const kewenanganSchema = new Schema(
     }
 )
 
-export type Kewengangan = InferSchemaType<typeof kewenanganSchema>
-export const Kewengangan = model("Kewenangan", kewenanganSchema)
+export type Kewenangan = InferSchemaType<typeof kewenanganSchema>
+export const Kewenangan = model("Kewenangan", kewenanganSchema)
