@@ -1,9 +1,9 @@
-import { Schema, type InferSchemaType, model } from "mongoose"
-import { Research } from "./researches"
+import mongoose, { Schema, type InferSchemaType, model } from "mongoose"
 
 const warrantSchema = new Schema(
     {
         warrantNumber: { type: String, required: true },
+        satkerId: {type: mongoose.Types.ObjectId, ref: "Satker", required: true },
         description: { type: String, required: true },
         document: { type: String, required: true },
         warrantType: { type: Number, required: true, enum: [0, 1] }

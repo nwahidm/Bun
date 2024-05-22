@@ -8,12 +8,13 @@ import { Interrogation } from "../models/interrogations"
 const url = "http://paket2.kejaksaan.info:5025/"
 
 export const fetchAllWarrants = async (req: Request, res: Response, next: NextFunction) => {
-    const { warrantNumber, description, warrantType, startDate, endDate } = req.body
-    console.log("[FETCH ALL WARRANTS]", warrantNumber, description, warrantType)
+    const { warrantNumber, satkerId, description, warrantType, startDate, endDate } = req.body
+    console.log("[FETCH ALL WARRANTS]", warrantNumber, satkerId, description, warrantType)
 
     try {
         let where = {}
         if (warrantNumber) where = { ...where, warrantNumber: { $regex: warrantNumber, $options: 'i' } }
+        if (satkerId) where = { ...where, satkerId }
         if (description) where = { ...where, description: { $regex: description, $options: 'i' } }
         if (warrantType) where = { ...where, warrantType }
         if (startDate && endDate) {
@@ -25,7 +26,7 @@ export const fetchAllWarrants = async (req: Request, res: Response, next: NextFu
             }
         }
 
-        const warrants = await Warrant.find(where).sort([['createdAt', 'desc']])
+        const warrants = await Warrant.find(where).populate('satkerId').sort([['createdAt', 'desc']])
         const totalOpenWarrant = await Warrant.countDocuments({ warrantType: 0 })
         const totalCloseWarrant = await Warrant.countDocuments({ warrantType: 1 })
 
@@ -43,16 +44,17 @@ export const fetchAllWarrants = async (req: Request, res: Response, next: NextFu
 }
 
 export const createWarrant = async (req: Request, res: Response, next: NextFunction) => {
-    const { warrantNumber, description, warrantType } = req.body
+    const { warrantNumber, satkerId, description, warrantType } = req.body
     let document
     if (req.files && (req.files as MulterFiles)['document']) {
         document = (req.files as MulterFiles)['document'][0].path
     }
-    console.log("[CREATE WARRANT]", warrantNumber, description, document, warrantType)
+    console.log("[CREATE WARRANT]", warrantNumber, satkerId, description, document, warrantType)
 
     try {
         const newWarrant = new Warrant({
             warrantNumber,
+            satkerId,
             description,
             document,
             warrantType
@@ -76,7 +78,7 @@ export const fetchWarrantDetail = async (req: Request, res: Response, next: Next
 
     try {
         //Check whether the warrant exist or not
-        const warrant = await Warrant.findById(id)
+        const warrant = await Warrant.findById(id).populate('satkerId')
 
         if (!warrant) {
             throw {
@@ -98,15 +100,15 @@ export const fetchWarrantDetail = async (req: Request, res: Response, next: Next
 
 export const updateWarrant = async (req: Request, res: Response, next: NextFunction) => {
     const _id = req.params.id
-    const { warrantNumber, description, warrantType } = req.body
+    const { warrantNumber, satkerId, description, warrantType } = req.body
     let document
     if (req.files && (req.files as MulterFiles)['document']) {
         document = (req.files as MulterFiles)['document'][0].path
     }
-    console.log("[UPDATE WARRANT]", warrantNumber, description, document, warrantType)
+    console.log("[UPDATE WARRANT]", warrantNumber, satkerId, description, document, warrantType)
 
     try {
-        //Check whether the Warrant exist or not
+        //Check whether the warrant exist or not
         const warrant = await Warrant.findById(_id)
 
         if (!warrant) {
@@ -119,6 +121,7 @@ export const updateWarrant = async (req: Request, res: Response, next: NextFunct
         //Updated Data
         let updatedData = {}
         if (warrantNumber) updatedData = { ...updatedData, warrantNumber }
+        if (satkerId) updatedData = { ...updatedData, satkerId }
         if (description) updatedData = { ...updatedData, description }
         if (document) updatedData = { ...updatedData, document }
         if (warrantType) updatedData = { ...updatedData, warrantType }
