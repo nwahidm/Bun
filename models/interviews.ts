@@ -5,6 +5,13 @@ const interviewSchema = new Schema(
         researchId: { type: mongoose.Types.ObjectId, ref: "Research", required: true },
         name: { type: String },
         schedule: { type: Date },
+        interviewer: { type: String },
+        respondent: {
+            name: { type: String },
+            nation: { type: String },
+            IDCardNumber: { type: String },
+            gender: { type: String }
+        },
         advice: { type: String },
         follow_up: { type: String },
         result: { type: String },

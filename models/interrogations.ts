@@ -7,6 +7,7 @@ const interrogationSchema = new Schema(
         record: { type: String },
         targetIdentification: {
             name: { type: String },
+            gender: { type: String },
             posture: { type: String },
             height: { type: String },
             skinColor: { type: String }

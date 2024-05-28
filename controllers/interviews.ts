@@ -36,14 +36,16 @@ export const fetchAllInterviews = async (req: Request, res: Response, next: Next
 }
 
 export const createInterview = async (req: Request, res: Response, next: NextFunction) => {
-    const { researchId, name, schedule, advice, follow_up, result } = req.body
-    console.log("[CREATE INTERVIEW]", researchId, name, schedule, advice, follow_up, result)
+    const { researchId, name, schedule, interviewer, respondent, advice, follow_up, result } = req.body
+    console.log("[CREATE INTERVIEW]", researchId, name, schedule, interviewer, respondent, advice, follow_up, result)
 
     try {
         const newInterview = new Interview({
             researchId,
             name,
             schedule: moment(schedule).format(),
+            interviewer,
+            respondent,
             advice,
             follow_up,
             result,
@@ -87,8 +89,8 @@ export const fetchInterviewDetail = async (req: Request, res: Response, next: Ne
 
 export const updateInterview = async (req: Request, res: Response, next: NextFunction) => {
     const _id = req.params.id
-    const { name, schedule, advice, follow_up, result, status } = req.body
-    console.log("[UPDATE INTERVIEW]", name, schedule, advice, follow_up, result, status)
+    const { name, schedule, interviewer, respondent, advice, follow_up, result, status } = req.body
+    console.log("[UPDATE INTERVIEW]", name, schedule, interviewer, respondent, advice, follow_up, result, status)
 
     try {
         //Check whether the interview exist or not
@@ -105,6 +107,8 @@ export const updateInterview = async (req: Request, res: Response, next: NextFun
         let updatedData = {}
         if (name) updatedData = { ...updatedData, name }
         if (schedule) updatedData = { ...updatedData, schedule: moment(schedule).format() }
+        if (interviewer) updatedData = { ...updatedData, interviewer }
+        if (respondent) updatedData = { ...updatedData, respondent }
         if (advice) updatedData = { ...updatedData, advice }
         if (follow_up) updatedData = { ...updatedData, follow_up }
         if (result) updatedData = { ...updatedData, result }
