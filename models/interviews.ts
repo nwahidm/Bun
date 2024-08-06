@@ -2,15 +2,22 @@ import mongoose, { Schema, type InferSchemaType, model } from "mongoose"
 
 const interviewSchema = new Schema(
     {
-        researchId: { type: mongoose.Types.ObjectId, ref: "Research", required: true },
-        name: { type: String },
+        caseId: { type: mongoose.Types.ObjectId, ref: "Case", required: true },
+        warrantId: { type: mongoose.Types.ObjectId, ref: "Warrant", required: true },
         schedule: { type: Date },
-        interviewer: { type: String },
+        location: { type: String },
+        interviewer: {
+            name: { type: String },
+            occupation: { type: String },
+            NIP: { type: String }
+        },
         respondent: {
             name: { type: String },
             nation: { type: String },
             IDCardNumber: { type: String },
-            gender: { type: String }
+            gender: { type: String },
+            address: { type: String },
+            profession: { type: String }
         },
         advice: { type: String },
         follow_up: { type: String },

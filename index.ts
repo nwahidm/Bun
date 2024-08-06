@@ -7,6 +7,7 @@ import kewenanganRouter from "./routes/kewenangan"
 import notificationRouter from "./routes/notifications"
 import researchRouter from "./routes/researches"
 import warrantRouter from "./routes/warrants"
+import caseRouter from "./routes/cases"
 import interviewRouter from "./routes/interviews"
 import interrogationRouter from "./routes/interrogations"
 import elicitationRouter from "./routes/elicitations"
@@ -30,7 +31,8 @@ connectDB()
 app.use(multerMiddleware.fields([
     { name: 'avatar', maxCount: 1 },
     { name: 'foto', maxCount: 1 },
-    { name: 'document', maxCount: 1 }
+    { name: 'document', maxCount: 1 },
+    { name: 'lapinsus', maxCount: 1 }
 ]))
 
 app.use(express.json())
@@ -58,6 +60,7 @@ app.use("/user", userRouter)
 app.use("/log", logRouter)
 app.use("/kewenangan", kewenanganRouter)
 app.use("/notification", notificationRouter)
+app.use("/case", caseRouter)
 app.use("/warrant", warrantRouter)
 app.use("/research", researchRouter)
 app.use("/interview", interviewRouter)

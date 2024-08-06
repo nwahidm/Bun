@@ -1,11 +1,10 @@
 import { type NextFunction, type Request, type Response } from "express"
 import { Interview } from "../models/interviews"
 import moment from "moment"
-const url = "http://paket2.kejaksaan.info:5025/"
 
 export const fetchAllInterviews = async (req: Request, res: Response, next: NextFunction) => {
-    const { name, status, startDate, endDate } = req.body
-    console.log("[FETCH ALL INTERVIEWS]", name, status, startDate, endDate)
+    const { status, startDate, endDate } = req.body
+    console.log("[FETCH ALL INTERVIEWS]", status, startDate, endDate)
 
     try {
         const totalNotYetFollowedUp = await Interview.countDocuments({ status: 0 })
@@ -13,7 +12,6 @@ export const fetchAllInterviews = async (req: Request, res: Response, next: Next
         const totalFollowedUp = await Interview.countDocuments({ status: 2 })
 
         let where = {}
-        if (name) where = { ...where, name: { $regex: name, $options: 'i' } }
         if (status) where = { ...where, status }
         if (startDate && endDate) {
             where = {
@@ -24,7 +22,7 @@ export const fetchAllInterviews = async (req: Request, res: Response, next: Next
             }
         }
 
-        const interviews = await Interview.find(where).populate('researchId', 'name').sort([['createdAt', 'desc']])
+        const interviews = await Interview.find(where).populate('caseId', 'name').populate('warrantId', 'warrantNumber').sort([['createdAt', 'desc']])
 
         res.status(200).json({
             status: 200,
@@ -36,14 +34,15 @@ export const fetchAllInterviews = async (req: Request, res: Response, next: Next
 }
 
 export const createInterview = async (req: Request, res: Response, next: NextFunction) => {
-    const { researchId, name, schedule, interviewer, respondent, advice, follow_up, result } = req.body
-    console.log("[CREATE INTERVIEW]", researchId, name, schedule, interviewer, respondent, advice, follow_up, result)
+    const { caseId, warrantId, schedule, location, interviewer, respondent, advice, follow_up, result } = req.body
+    console.log("[CREATE INTERVIEW]", caseId, warrantId, schedule, location, interviewer, respondent, advice, follow_up, result)
 
     try {
         const newInterview = new Interview({
-            researchId,
-            name,
+            caseId, 
+            warrantId,
             schedule: moment(schedule).format(),
+            location,
             interviewer,
             respondent,
             advice,
@@ -69,7 +68,7 @@ export const fetchInterviewDetail = async (req: Request, res: Response, next: Ne
 
     try {
         //Check whether the interview exist or not
-        const interview = await Interview.findById(id).populate('researchId', 'name')
+        const interview = await Interview.findById(id).populate('caseId', 'name').populate('warrantId', 'warrantNumber')
 
         if (!interview) {
             throw {
@@ -89,8 +88,8 @@ export const fetchInterviewDetail = async (req: Request, res: Response, next: Ne
 
 export const updateInterview = async (req: Request, res: Response, next: NextFunction) => {
     const _id = req.params.id
-    const { name, schedule, interviewer, respondent, advice, follow_up, result, status } = req.body
-    console.log("[UPDATE INTERVIEW]", name, schedule, interviewer, respondent, advice, follow_up, result, status)
+    const { schedule, location, interviewer, respondent, advice, follow_up, result, status } = req.body
+    console.log("[UPDATE INTERVIEW]", schedule, location, interviewer, respondent, advice, follow_up, result, status)
 
     try {
         //Check whether the interview exist or not
@@ -105,8 +104,8 @@ export const updateInterview = async (req: Request, res: Response, next: NextFun
 
         //Updated Data
         let updatedData = {}
-        if (name) updatedData = { ...updatedData, name }
         if (schedule) updatedData = { ...updatedData, schedule: moment(schedule).format() }
+        if (location) updatedData = { ...updatedData, location }
         if (interviewer) updatedData = { ...updatedData, interviewer }
         if (respondent) updatedData = { ...updatedData, respondent }
         if (advice) updatedData = { ...updatedData, advice }

@@ -2,7 +2,7 @@ import mongoose from "mongoose"
 
 export default async function connectDB() {
     try {
-        await mongoose.connect(Bun.env.URI as string)
+        await mongoose.connect(Bun.env.MONGO_URI as string)
     } catch (error) {
         const castedError = error as Error
         console.error(castedError.message)

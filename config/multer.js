@@ -13,6 +13,8 @@ const multerMiddleware = multer({
         uploadPath += 'notification';
       } else if (file.fieldname === 'document') {
         uploadPath += 'document';
+      } else if (file.fieldname === 'lapinsus') {
+        uploadPath += 'lapinsus';
       } else {
         uploadPath += 'default';
       }

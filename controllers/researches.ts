@@ -24,7 +24,7 @@ export const fetchAllResearches = async (req: Request, res: Response, next: Next
             }
         }
 
-        const researches = await Research.find(where).populate('warrantId').sort([['createdAt', 'desc']])
+        const researches = await Research.find(where).populate('caseId').populate('warrantId').sort([['createdAt', 'desc']])
 
         for (let i of researches) {
             if (!((<any>i).warrantId.document).startsWith(url)) {
@@ -42,20 +42,19 @@ export const fetchAllResearches = async (req: Request, res: Response, next: Next
 }
 
 export const createResearch = async (req: Request, res: Response, next: NextFunction) => {
-    const { warrantId, name, lapinsus, advice, follow_up, threats, interference, barrier, challenges } = req.body
-    console.log("[CREATE RESEARCH]", warrantId, name, lapinsus, advice, follow_up, threats, interference, barrier, challenges)
+    const { caseId, warrantId, name, lapinsus, advice, follow_up, aghtType, aghtDescription } = req.body
+    console.log("[CREATE RESEARCH]", caseId, name, lapinsus, advice, follow_up, aghtType, aghtDescription)
 
     try {
         const newResearch = new Research({
+            caseId,
             warrantId,
             name,
             lapinsus,
             advice,
             follow_up,
-            threats,
-            interference,
-            barrier,
-            challenges,
+            aghtType,
+            aghtDescription,
             status: 0
         })
 
@@ -76,7 +75,7 @@ export const fetchResearchDetail = async (req: Request, res: Response, next: Nex
 
     try {
         //Check whether the research exist or not
-        const research = await Research.findById(id).populate('warrantId')
+        const research = await Research.findById(id).populate('caseId').populate('caseId').populate('warrantId')
 
         if (!research) {
             throw {
@@ -98,8 +97,8 @@ export const fetchResearchDetail = async (req: Request, res: Response, next: Nex
 
 export const updateResearch = async (req: Request, res: Response, next: NextFunction) => {
     const _id = req.params.id
-    const { name, lapinsus, advice, follow_up, threats, interference, barrier, challenges, status } = req.body
-    console.log("[UPDATE RESEARCH]", name, lapinsus, advice, follow_up, threats, interference, barrier, challenges, status)
+    const { name, lapinsus, advice, follow_up, aghtType, aghtDescription, status } = req.body
+    console.log("[UPDATE RESEARCH]", name, lapinsus, advice, follow_up, aghtType, aghtDescription, status)
 
     try {
         //Check whether the research exist or not
@@ -118,10 +117,8 @@ export const updateResearch = async (req: Request, res: Response, next: NextFunc
         if (lapinsus) updatedData = { ...updatedData, lapinsus }
         if (advice) updatedData = { ...updatedData, advice }
         if (follow_up) updatedData = { ...updatedData, follow_up }
-        if (threats) updatedData = { ...updatedData, threats }
-        if (interference) updatedData = { ...updatedData, interference }
-        if (barrier) updatedData = { ...updatedData, barrier }
-        if (challenges) updatedData = { ...updatedData, challenges }
+        if (aghtType) updatedData = { ...updatedData, aghtType }
+        if (aghtDescription) updatedData = { ...updatedData, aghtDescription }
         if (status) updatedData = { ...updatedData, status }
 
         //Update Research
