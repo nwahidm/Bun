@@ -22,7 +22,7 @@ export const fetchAllCases = async (req: Request, res: Response, next: NextFunct
         if (caseType) where = { ...where, caseType }
         
 
-        const Cases = await Case.find(where).populate('satkerId').sort([['createdAt', 'desc']])
+        const Cases = await Case.find(where).populate('satkerId', 'name').sort([['createdAt', 'desc']])
         const totalOpenCase = await Case.countDocuments({ CaseType: 0 })
         const totalCloseCase = await Case.countDocuments({ CaseType: 1 })
 

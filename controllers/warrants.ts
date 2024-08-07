@@ -26,7 +26,7 @@ export const fetchAllWarrants = async (req: Request, res: Response, next: NextFu
             }
         }
 
-        const warrants = await Warrant.find(where).populate('caseId').populate('satkerId').sort([['createdAt', 'desc']])
+        const warrants = await Warrant.find(where).populate('caseId', 'name').populate('satkerId', 'name').sort([['createdAt', 'desc']])
         const totalOpenWarrant = await Warrant.countDocuments({ warrantType: 0 })
         const totalCloseWarrant = await Warrant.countDocuments({ warrantType: 1 })
 

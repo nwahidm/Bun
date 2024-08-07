@@ -54,7 +54,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
             nama_lengkap,
             nip,
             jenis_kelamin,
-            kewenangan_id: "65c25f127304819438bf884d",
+            kewenangan_id: "66b1c5868f587f64bca90d69",
             avatar,
             enabled: false
         })

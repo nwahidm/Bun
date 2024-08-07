@@ -24,13 +24,7 @@ export const fetchAllResearches = async (req: Request, res: Response, next: Next
             }
         }
 
-        const researches = await Research.find(where).populate('caseId').populate('warrantId').sort([['createdAt', 'desc']])
-
-        for (let i of researches) {
-            if (!((<any>i).warrantId.document).startsWith(url)) {
-                (<any>i).warrantId.document = url + (<any>i).warrantId.document;
-            }
-        }
+        const researches = await Research.find(where).populate('caseId', 'name').populate('warrantId', 'warrantNumber').sort([['createdAt', 'desc']])
 
         res.status(200).json({
             status: 200,
@@ -75,7 +69,7 @@ export const fetchResearchDetail = async (req: Request, res: Response, next: Nex
 
     try {
         //Check whether the research exist or not
-        const research = await Research.findById(id).populate('caseId').populate('caseId').populate('warrantId')
+        const research = await Research.findById(id).populate({ path: 'caseId', populate: { path: 'satkerId' } }).populate('warrantId')
 
         if (!research) {
             throw {

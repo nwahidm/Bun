@@ -1,6 +1,7 @@
 import { type NextFunction, type Request, type Response } from "express"
 import { Interview } from "../models/interviews"
 import moment from "moment"
+const url = "http://paket2.kejaksaan.info:5025/"
 
 export const fetchAllInterviews = async (req: Request, res: Response, next: NextFunction) => {
     const { status, startDate, endDate } = req.body
@@ -68,7 +69,7 @@ export const fetchInterviewDetail = async (req: Request, res: Response, next: Ne
 
     try {
         //Check whether the interview exist or not
-        const interview = await Interview.findById(id).populate('caseId', 'name').populate('warrantId', 'warrantNumber')
+        const interview = await Interview.findById(id).populate({ path: 'caseId', populate: { path: 'satkerId' } }).populate('warrantId')
 
         if (!interview) {
             throw {
@@ -76,6 +77,8 @@ export const fetchInterviewDetail = async (req: Request, res: Response, next: Ne
                 message: "Interview tidak ditemukan"
             }
         }
+
+        (<any>interview).warrantId.document = url + (<any>interview).warrantId.document
 
         res.status(200).json({
             status: 200,
