@@ -2,15 +2,30 @@ import mongoose, { Schema, type InferSchemaType, model } from "mongoose"
 
 const interrogationSchema = new Schema(
     {
-        interviewId: { type: mongoose.Types.ObjectId, ref: "Interview", required: true },
+        caseId: { type: mongoose.Types.ObjectId, ref: "Case", required: true },
+        warrantId: { type: mongoose.Types.ObjectId, ref: "Warrant", required: true },
         name: { type: String },
+        date: { type: Date },
         record: { type: String },
+        location: { type: String },
+        interrogators: [
+            {
+                name: { type: String },
+                occupation: { type: String },
+                nip: { type: String }
+            }
+        ],
         targetIdentification: {
             name: { type: String },
-            gender: { type: String },
-            posture: { type: String },
-            height: { type: String },
-            skinColor: { type: String }
+            placeOfBirth: { type: String },
+            dateOfBirth: { type: Date },
+            nationality: { type: String },
+            domicile: { type: String },
+            religion: { type: String },
+            profession: { type: String },
+            education: { type: String },
+            phoneNumber: { type: String },
+            IDCardNumber: { type: String }
         },
         result: { type: String },
         status: { type: Number }

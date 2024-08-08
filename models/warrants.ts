@@ -4,7 +4,8 @@ const warrantSchema = new Schema(
     {
         caseId: { type: mongoose.Types.ObjectId, ref: "Case", required: true },
         warrantNumber: { type: String, required: true },
-        satkerId: {type: mongoose.Types.ObjectId, ref: "Satker", required: true },
+        satkerId: { type: mongoose.Types.ObjectId, ref: "Satker", required: true },
+        date: { type: Date },
         description: { type: String, required: true },
         document: { type: String, required: true },
         warrantType: { type: Number, required: true, enum: [0, 1] }

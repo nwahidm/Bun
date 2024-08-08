@@ -19,7 +19,7 @@ export const fetchAllWarrants = async (req: Request, res: Response, next: NextFu
         if (warrantType) where = { ...where, warrantType }
         if (startDate && endDate) {
             where = {
-                ...where, createdAt: {
+                ...where, date: {
                     $gte: moment(startDate).startOf("day").format(),
                     $lte: moment(endDate).endOf("day").format(),
                 }
@@ -44,7 +44,7 @@ export const fetchAllWarrants = async (req: Request, res: Response, next: NextFu
 }
 
 export const createWarrant = async (req: Request, res: Response, next: NextFunction) => {
-    const { caseId, warrantNumber, satkerId, description, warrantType } = req.body
+    const { caseId, warrantNumber, satkerId, date, description, warrantType } = req.body
     let document
     if (req.files && (req.files as MulterFiles)['document']) {
         document = (req.files as MulterFiles)['document'][0].path
@@ -56,6 +56,7 @@ export const createWarrant = async (req: Request, res: Response, next: NextFunct
             caseId,
             warrantNumber,
             satkerId,
+            date,
             description,
             document,
             warrantType
@@ -101,7 +102,7 @@ export const fetchWarrantDetail = async (req: Request, res: Response, next: Next
 
 export const updateWarrant = async (req: Request, res: Response, next: NextFunction) => {
     const _id = req.params.id
-    const { warrantNumber, satkerId, description, warrantType } = req.body
+    const { warrantNumber, satkerId, date, description, warrantType } = req.body
     let document
     if (req.files && (req.files as MulterFiles)['document']) {
         document = (req.files as MulterFiles)['document'][0].path
@@ -123,6 +124,7 @@ export const updateWarrant = async (req: Request, res: Response, next: NextFunct
         let updatedData = {}
         if (warrantNumber) updatedData = { ...updatedData, warrantNumber }
         if (satkerId) updatedData = { ...updatedData, satkerId }
+        if (date) updatedData = { ...updatedData, date: moment(date).format() }
         if (description) updatedData = { ...updatedData, description }
         if (document) updatedData = { ...updatedData, document }
         if (warrantType) updatedData = { ...updatedData, warrantType }

@@ -24,7 +24,7 @@ export const fetchAllInterrogations = async (req: Request, res: Response, next: 
             }
         }
 
-        const interrogations = await Interrogation.find(where).populate('interviewId', 'name').sort([['createdAt', 'desc']])
+        const interrogations = await Interrogation.find(where).populate('caseId', 'name').populate('warrantId', 'warrantNumber').sort([['createdAt', 'desc']])
 
         res.status(200).json({
             status: 200,
@@ -36,14 +36,18 @@ export const fetchAllInterrogations = async (req: Request, res: Response, next: 
 }
 
 export const createInterrogation = async (req: Request, res: Response, next: NextFunction) => {
-    const { interviewId, name, record, targetIdentification, result } = req.body
-    console.log("[CREATE INTERROGATION]", interviewId, name, record, targetIdentification, result)
+    const { caseId, warrantId, name, date, record, location, interrogators, targetIdentification, result } = req.body
+    console.log("[CREATE INTERROGATION]", caseId, warrantId, name, date, record, location, interrogators, targetIdentification, result)
 
     try {
         const newInterrogation = new Interrogation({
-            interviewId,
+            caseId,
+            warrantId,
             name,
+            date,
             record,
+            location,
+            interrogators,
             targetIdentification,
             result,
             status: 0
@@ -66,7 +70,7 @@ export const fetchInterrogationDetail = async (req: Request, res: Response, next
 
     try {
         //Check whether the interrogation exist or not
-        const interrogation = await Interrogation.findById(id).populate('interviewId', 'name')
+        const interrogation = await Interrogation.findById(id).populate({ path: 'caseId', populate: { path: 'satkerId' } }).populate('warrantId')
 
         if (!interrogation) {
             throw {
@@ -74,6 +78,8 @@ export const fetchInterrogationDetail = async (req: Request, res: Response, next
                 message: "Interrogation tidak ditemukan"
             }
         }
+
+        (<any>interrogation).warrantId.document = url + (<any>interrogation).warrantId.document
 
         res.status(200).json({
             status: 200,
@@ -86,8 +92,8 @@ export const fetchInterrogationDetail = async (req: Request, res: Response, next
 
 export const updateInterrogation = async (req: Request, res: Response, next: NextFunction) => {
     const _id = req.params.id
-    const { name, record, targetIdentification, result, status } = req.body
-    console.log("[UPDATE INTERROGATION]", name, record, targetIdentification, result, status)
+    const { name, date, record, location, interrogators, targetIdentification, result, status } = req.body
+    console.log("[UPDATE INTERROGATION]", name, date, record, location, interrogators, targetIdentification, result, status)
 
     try {
         //Check whether the interrogation exist or not
@@ -103,7 +109,10 @@ export const updateInterrogation = async (req: Request, res: Response, next: Nex
         //Updated Data
         let updatedData = {}
         if (name) updatedData = { ...updatedData, name }
+        if (date) updatedData = { ...updatedData, date: moment(date).format() }
         if (record) updatedData = { ...updatedData, record }
+        if (location) updatedData = { ...updatedData, location }
+        if (interrogators) updatedData = { ...updatedData, interrogators }
         if (targetIdentification) updatedData = { ...updatedData, targetIdentification }
         if (result) updatedData = { ...updatedData, result }
         if (status) updatedData = { ...updatedData, status }
