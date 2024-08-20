@@ -2,12 +2,21 @@ import mongoose, { Schema, type InferSchemaType, model } from "mongoose"
 
 const elicitationSchema = new Schema(
     {
-        interviewId: { type: mongoose.Types.ObjectId, ref: "Interview", required: true },
+        caseId: { type: mongoose.Types.ObjectId, ref: "Case", required: true },
+        warrantId: { type: mongoose.Types.ObjectId, ref: "Warrant", required: true },
         name: { type: String },
         record: { type: String },
         advice: { type: String },
         follow_up: { type: String },
-        result: { type: String },
+        result: {
+            number: { type: String },
+            introduction: { type: String },
+            execution: { type: String },
+            constraint: { type: String },
+            analysis: { type: String },
+            conclusion: { type: String },
+            advice: { type: String }
+        },
         status: { type: Number }
     },
     {

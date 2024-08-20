@@ -24,7 +24,7 @@ export const fetchAllElicitations = async (req: Request, res: Response, next: Ne
             }
         }
 
-        const elicitations = await Elicitation.find(where).populate('interviewId', 'name').sort([['createdAt', 'desc']])
+        const elicitations = await Elicitation.find(where).populate('caseId', 'name').populate('warrantId', 'warrantNumber').sort([['createdAt', 'desc']])
 
         res.status(200).json({
             status: 200,
@@ -36,12 +36,13 @@ export const fetchAllElicitations = async (req: Request, res: Response, next: Ne
 }
 
 export const createElicitation = async (req: Request, res: Response, next: NextFunction) => {
-    const { interviewId, name, record, advice, follow_up, result } = req.body
-    console.log("[CREATE ELICITATION]", interviewId, name, record, advice, follow_up, result)
+    const { caseId, warrantId, name, record, advice, follow_up, result } = req.body
+    console.log("[CREATE ELICITATION]", caseId, warrantId, name, record, advice, follow_up, result)
 
     try {
         const newElicitation = new Elicitation({
-            interviewId,
+            caseId, 
+            warrantId,
             name,
             record,
             advice,
@@ -67,7 +68,7 @@ export const fetchElicitationDetail = async (req: Request, res: Response, next: 
 
     try {
         //Check whether the elicitation exist or not
-        const elicitation = await Elicitation.findById(id).populate('interviewId', 'name')
+        const elicitation = await Elicitation.findById(id).populate({ path: 'caseId', populate: { path: 'satkerId' } }).populate('warrantId')
 
         if (!elicitation) {
             throw {
