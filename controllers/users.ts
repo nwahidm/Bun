@@ -289,8 +289,8 @@ export const fetchAllUsers = async (req: JWTRequest, res: Response, next: NextFu
         if (nip) where = { ...where, nip: { $regex: nip, $options: 'i' } }
 
         const totalUser = await User.countDocuments({})
-        const totalActiveUser = await User.countDocuments({enabled: true})
-        const totalDeactiveUser = await User.countDocuments({enabled: false})
+        const totalActiveUser = await User.countDocuments({ enabled: true })
+        const totalDeactiveUser = await User.countDocuments({ enabled: false })
 
         const users = await User.find(where).skip(offset).limit(limit).populate('kewenangan_id', 'deskripsi')
 
@@ -302,7 +302,7 @@ export const fetchAllUsers = async (req: JWTRequest, res: Response, next: NextFu
 
         res.status(200).json({
             status: 200,
-            data: {totalUser, totalActiveUser, totalDeactiveUser, users}
+            data: { totalUser, totalActiveUser, totalDeactiveUser, users }
         })
     } catch (error) {
         next(error)
@@ -315,24 +315,13 @@ export const fetchUserDetail = async (req: Request, res: Response, next: NextFun
 
     try {
         //Check whether the user exists or not
-        const targetUser = await User.findById(_id)
+        const user = await User.findById(_id).select("-password -notifications -createdAt -updatedAt").populate('kewenangan_id', 'deskripsi')
 
-        if (!targetUser) {
+        if (!user) {
             throw {
                 name: "Not Found",
                 message: "User tidak ditemukan"
             }
-        }
-
-        const user = {
-            _id: targetUser._id,
-            username: targetUser.username,
-            email: targetUser.email,
-            nama_lengkap: targetUser.nama_lengkap,
-            nip: targetUser.nip,
-            jenis_kelamin: targetUser.jenis_kelamin,
-            avatar: url + targetUser.avatar,
-            kewenangan_id: targetUser.kewenangan_id
         }
 
         res.status(200).json({
